@@ -315,6 +315,14 @@ function renderAll() {
   badge.className = 'mode-badge ' + (p.mode === 'deep' ? 'mode-deep' : 'mode-sprint');
   document.getElementById('update-time').textContent = p.updated_at || '';
 
+  // Add material/constraints summary
+  const metaLine = [];
+  if (p.material_summary) metaLine.push('📄 ' + p.material_summary);
+  if (p.constraints) metaLine.push('⏱ ' + p.constraints);
+  if (metaLine.length) {
+    document.getElementById('info-line').textContent += ' | ' + metaLine.join(' | ');
+  }
+
   renderMap(p);
   renderFlashcards();
   renderProgress(p);

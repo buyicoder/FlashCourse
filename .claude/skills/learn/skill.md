@@ -60,7 +60,7 @@ description: 快速学习理工科科目。支持深度学习（理解本质+项
 progress.json 初始内容参考 shared.md 中的 schema。关键字段：
 - `subject`: 学科名
 - `mode`: "deep" 或 "sprint"
-- `materials`: 已解析的材料列表（type, path/url, summary）
+- `material_summary`: 已解析材料的文字概述（如 "已解析：课件.pdf（第1-6章）"）
 - `constraints`: 时间/范围约束（如有）
 - `status`: "not_started"
 - `current_stage`: "信息收集完成"

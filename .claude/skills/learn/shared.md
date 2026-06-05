@@ -75,6 +75,15 @@ learn-sessions/
     }
   ],
   "weak_points": ["string array, 薄弱考点ID"],
+  "error_log": [
+    {
+      "point_id": "string, 对应考点ID",
+      "question": "string, 错题描述",
+      "student_answer": "string, 学生答案",
+      "correct_answer": "string, 正确答案",
+      "error_type": "概念不清 | 计算失误 | 题型不熟 | 粗心"
+    }
+  ],
   "material_summary": "string, 已解析材料概述",
   "constraints": "string | null, 时间/范围约束"
 }
