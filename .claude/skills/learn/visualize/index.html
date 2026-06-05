@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn — 学习看板</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  header h1 { font-size: 1.5rem; }
+  .mode-badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .mode-deep { background: #1e3a5f; color: var(--accent); }
+  .mode-sprint { background: #3b1f1f; color: var(--red); }
+  nav {
+    display: flex;
+    gap: 4px;
+    padding: 12px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  nav button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  nav button:hover { color: var(--text); background: var(--border); }
+  nav button.active { color: var(--accent); background: #1e3a5f; }
+  main { max-width: 900px; margin: 24px auto; padding: 0 24px; }
+  .tab { display: none; }
+  .tab.active { display: block; }
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 4rem; margin-bottom: 16px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .flashcard-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 500px;
+    height: 280px;
+    margin: 24px auto;
+    cursor: pointer;
+  }
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .flashcard-inner.flipped { transform: rotateY(180deg); }
+  .flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  .flashcard-front {
+    background: linear-gradient(135deg, #1e3a5f, #0f172a);
+    border: 2px solid var(--accent);
+  }
+  .flashcard-back {
+    background: linear-gradient(135deg, #14532d, #0f172a);
+    border: 2px solid var(--green);
+    transform: rotateY(180deg);
+  }
+  .flashcard-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .flashcard-nav button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .flashcard-nav button:hover { background: var(--border); }
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 8px 0 16px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s;
+  }
+  .fill-green { background: var(--green); }
+  .fill-yellow { background: var(--yellow); }
+  .fill-red { background: var(--red); }
+  .point-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .mastery-dots { display: flex; gap: 4px; }
+  .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--border);
+  }
+  .dot.filled { background: var(--green); }
+  .dot.filled-yellow { background: var(--yellow); }
+  .dot.filled-red { background: var(--red); }
+  .error-card {
+    background: var(--surface);
+    border-left: 4px solid var(--red);
+    padding: 16px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 12px;
+  }
+  .error-card summary { cursor: pointer; font-weight: 600; margin-bottom: 8px; }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-right: 4px;
+  }
+  .tag-concept { background: #7f1d1d; color: #fca5a5; }
+  .tag-calc { background: #78350f; color: #fcd34d; }
+  .tag-unfamiliar { background: #1e3a5f; color: #93c5fd; }
+  .tag-careless { background: #334155; color: #cbd5e1; }
+  .chart-wrap { max-width: 400px; margin: 24px auto; }
+  #mermaid-diagram { text-align: center; }
+  .subject-selector {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="subject-title">📚 学习看板</h1>
+    <span style="font-size:0.85rem;color:var(--muted)" id="info-line">等待加载数据...</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="mode-badge" id="mode-badge">--</span>
+    <span style="font-size:0.8rem;color:var(--muted)" id="update-time"></span>
+  </div>
+</header>
+
+<nav>
+  <button class="active" data-tab="map">🗺 考点地图</button>
+  <button data-tab="flashcards">🃏 闪卡</button>
+  <button data-tab="progress">📊 进度</button>
+  <button data-tab="errors">📋 错题本</button>
+</nav>
+
+<main>
+  <!-- Tab 1: 考点地图 -->
+  <div class="tab active" id="tab-map">
+    <div class="card">
+      <div id="mermaid-diagram"></div>
+      <div class="empty-state" id="map-empty">
+        <div class="icon">🗺️</div>
+        <p>考点地图将在开始学习后生成</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: 闪卡 -->
+  <div class="tab" id="tab-flashcards">
+    <div class="empty-state" id="flashcards-empty">
+      <div class="icon">🃏</div>
+      <p>闪卡将在开始学习后生成</p>
+      <p style="font-size:0.85rem;color:var(--muted)">点击正面翻转查看答案</p>
+    </div>
+    <div id="flashcards-content" style="display:none">
+      <div class="flashcard-container" id="flashcard">
+        <div class="flashcard-inner" id="flashcard-inner">
+          <div class="flashcard-front" id="fc-front"></div>
+          <div class="flashcard-back" id="fc-back"></div>
+        </div>
+      </div>
+      <div class="flashcard-nav">
+        <button id="fc-prev">◀ 上一张</button>
+        <span id="fc-counter" style="color:var(--muted)">1 / 1</span>
+        <button id="fc-next">下一张 ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 3: 进度看板 -->
+  <div class="tab" id="tab-progress">
+    <div class="empty-state" id="progress-empty">
+      <div class="icon">📊</div>
+      <p>进度数据将在学习开始后显示</p>
+    </div>
+    <div id="progress-content" style="display:none">
+      <div class="card">
+        <h3>总体进度</h3>
+        <div class="progress-bar"><div class="progress-fill fill-green" id="overall-bar" style="width:0%"></div></div>
+        <p style="color:var(--muted)" id="overall-text">0 / 0 考点掌握</p>
+      </div>
+      <div class="card">
+        <h3>掌握度分布</h3>
+        <div class="chart-wrap"><canvas id="mastery-chart"></canvas></div>
+      </div>
+      <div class="card" id="points-list"></div>
+    </div>
+  </div>
+
+  <!-- Tab 4: 错题本 -->
+  <div class="tab" id="tab-errors">
+    <div class="empty-state" id="errors-empty">
+      <div class="icon">📋</div>
+      <p>暂无错题，继续保持！</p>
+    </div>
+    <div id="errors-content" style="display:none"></div>
+  </div>
+</main>
+
+<script>
+// --- Data Loading ---
+let progressData = null;
+let cardsData = null;
+let currentCardIndex = 0;
+let masteryChart = null;
+
+async function loadData() {
+  try {
+    const [progResp, cardsResp] = await Promise.all([
+      fetch('./data/progress.json'),
+      fetch('./data/cards.json')
+    ]);
+    if (progResp.ok) progressData = await progResp.json();
+    if (cardsResp.ok) cardsData = await cardsResp.json();
+    if (progressData) renderAll();
+  } catch(e) {
+    document.getElementById('info-line').textContent = '未找到数据文件，请先通过 /learn 开始学习';
+  }
+}
+
+function renderAll() {
+  const p = progressData;
+  document.getElementById('subject-title').textContent = '📚 ' + (p.subject || '学习看板');
+  document.getElementById('info-line').textContent =
+    (p.mode === 'deep' ? '🧠 深度学习' : '📝 考试冲刺') +
+    (p.current_stage ? ' · ' + p.current_stage : '');
+  const badge = document.getElementById('mode-badge');
+  badge.textContent = p.mode === 'deep' ? '深度学习' : '考试冲刺';
+  badge.className = 'mode-badge ' + (p.mode === 'deep' ? 'mode-deep' : 'mode-sprint');
+  document.getElementById('update-time').textContent = p.updated_at || '';
+
+  renderMap(p);
+  renderFlashcards();
+  renderProgress(p);
+  renderErrors(p);
+}
+
+// --- Tab Switching ---
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'progress' && progressData) renderProgress(progressData);
+    if (btn.dataset.tab === 'map' && progressData) renderMap(progressData);
+  });
+});
+
+// --- Map Tab ---
+let mermaidInitialized = false;
+async function renderMap(p) {
+  const points = p.exam_points || [];
+  const deepTopics = p.deep_topics || [];
+  if (points.length === 0 && deepTopics.length === 0) {
+    document.getElementById('map-empty').style.display = 'block';
+    document.getElementById('mermaid-diagram').innerHTML = '';
+    return;
+  }
+  document.getElementById('map-empty').style.display = 'none';
+
+  let mermaidCode = 'graph TD\n';
+  mermaidCode += '  Root["' + (p.subject || '课程') + '"]\n';
+
+  if (p.mode === 'sprint') {
+    const high = points.filter(pt => pt.weight === '高频');
+    const mid = points.filter(pt => pt.weight === '中频');
+    const low = points.filter(pt => pt.weight === '低频');
+    if (high.length) {
+      mermaidCode += '  subgraph High[🔴 高频考点]\n';
+      high.forEach(pt => {
+        mermaidCode += '  ' + pt.id + '["' + pt.topic + ' ' + masteryIcon(pt.mastery) + '"]\n';
+      });
+      mermaidCode += '  end\n';
+    }
+    if (mid.length) {
+      mermaidCode += '  subgraph Mid[🟡 中频考点]\n';
+      mid.forEach(pt => {
+        mermaidCode += '  ' + pt.id + '["' + pt.topic + ' ' + masteryIcon(pt.mastery) + '"]\n';
+      });
+      mermaidCode += '  end\n';
+    }
+    if (low.length) {
+      mermaidCode += '  subgraph Low[🟢 低频考点]\n';
+      low.forEach(pt => {
+        mermaidCode += '  ' + pt.id + '["' + pt.topic + ' ' + masteryIcon(pt.mastery) + '"]\n';
+      });
+      mermaidCode += '  end\n';
+    }
+    mermaidCode += '  Root';
+    if (high.length) mermaidCode += ' --> High';
+    if (mid.length) mermaidCode += ' --> Mid';
+    if (low.length) mermaidCode += ' --> Low';
+  } else {
+    deepTopics.forEach(t => {
+      mermaidCode += '  ' + t.id + '["' + t.topic + ' ' + masteryIcon(t.mastery) + '"]\n';
+      mermaidCode += '  Root --> ' + t.id + '\n';
+    });
+  }
+
+  document.getElementById('mermaid-diagram').innerHTML = '<pre class="mermaid">' + mermaidCode + '</pre>';
+  try {
+    await mermaid.run({ querySelector: '.mermaid' });
+    mermaidInitialized = true;
+  } catch(e) {
+    // mermaid render error, show raw code
+  }
+}
+
+function masteryIcon(m) {
+  if (m >= 4) return '✅';
+  if (m >= 2) return '⚠️';
+  return '❌';
+}
+
+// --- Flashcards Tab ---
+function renderFlashcards() {
+  const cards = cardsData?.cards || [];
+  // Also check progressData for inline flashcard data
+  const examPoints = progressData?.exam_points || [];
+  const inlineCards = examPoints.filter(p => p.flashcard).map(p => ({
+    id: p.id, topic: p.topic,
+    front: p.flashcard.front, back: p.flashcard.back,
+    difficulty: p.difficulty
+  }));
+  const allCards = cards.length >= inlineCards.length ? cards : inlineCards;
+
+  if (allCards.length === 0) {
+    document.getElementById('flashcards-empty').style.display = 'block';
+    document.getElementById('flashcards-content').style.display = 'none';
+    return;
+  }
+  document.getElementById('flashcards-empty').style.display = 'none';
+  document.getElementById('flashcards-content').style.display = 'block';
+
+  window._allCards = allCards;
+  currentCardIndex = 0;
+  showCard(0);
+
+  document.getElementById('flashcard').onclick = () => {
+    document.getElementById('flashcard-inner').classList.toggle('flipped');
+  };
+  document.getElementById('fc-prev').onclick = (e) => { e.stopPropagation(); showCard(currentCardIndex - 1); };
+  document.getElementById('fc-next').onclick = (e) => { e.stopPropagation(); showCard(currentCardIndex + 1); };
+}
+
+function showCard(i) {
+  const cards = window._allCards || [];
+  if (cards.length === 0) return;
+  currentCardIndex = (i + cards.length) % cards.length;
+  const card = cards[currentCardIndex];
+  document.getElementById('fc-front').innerHTML = '<div>' + card.front + '</div><div style="font-size:0.8rem;color:var(--muted);margin-top:12px">' + (card.topic || '') + '</div>';
+  document.getElementById('fc-back').innerHTML = card.back;
+  document.getElementById('flashcard-inner').classList.remove('flipped');
+  document.getElementById('fc-counter').textContent = (currentCardIndex + 1) + ' / ' + cards.length;
+}
+
+// --- Progress Tab ---
+function renderProgress(p) {
+  const points = p.exam_points || [];
+  const deepTopics = p.deep_topics || [];
+  const items = points.length > 0 ? points : deepTopics;
+
+  if (items.length === 0) {
+    document.getElementById('progress-empty').style.display = 'block';
+    document.getElementById('progress-content').style.display = 'none';
+    return;
+  }
+  document.getElementById('progress-empty').style.display = 'none';
+  document.getElementById('progress-content').style.display = 'block';
+
+  const mastered = items.filter(it => (it.mastery || 0) >= 3).length;
+  const pct = items.length > 0 ? Math.round((mastered / items.length) * 100) : 0;
+  document.getElementById('overall-bar').style.width = pct + '%';
+  document.getElementById('overall-text').textContent = mastered + ' / ' + items.length + ' 考点掌握 (' + pct + '%)';
+
+  // Mastery chart
+  const bins = [0, 0, 0, 0, 0, 0]; // mastery 0-5
+  items.forEach(it => bins[Math.min(it.mastery || 0, 5)]++);
+  const ctx = document.getElementById('mastery-chart');
+  if (masteryChart) masteryChart.destroy();
+  masteryChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['0 - 未开始', '1', '2', '3', '4', '5 - 完全掌握'],
+      datasets: [{
+        data: bins,
+        backgroundColor: ['#475569','#f87171','#fbbf24','#fbbf24','#4ade80','#22c55e']
+      }]
+    },
+    options: {
+      plugins: { legend: { labels: { color: '#e2e8f0' } } }
+    }
+  });
+
+  // Point detail list
+  const list = document.getElementById('points-list');
+  list.innerHTML = '<h3>各考点详情</h3>';
+  items.forEach(it => {
+    const mastery = it.mastery || 0;
+    let dots = '';
+    for (let i = 0; i < 5; i++) {
+      let cls = 'dot';
+      if (i < mastery) {
+        cls += mastery >= 4 ? ' filled' : mastery >= 2 ? ' filled-yellow' : ' filled-red';
+      }
+      dots += '<span class="' + cls + '"></span>';
+    }
+    const questions = it.total_questions ? ' · 做题' + it.total_questions + ' · 正确' + (it.correct || 0) : '';
+    const weight = it.weight ? ' <span style="color:var(--muted);font-size:0.8rem">[' + it.weight + ']</span>' : '';
+    list.innerHTML += '<div class="point-row"><div><strong>' + it.topic + '</strong>' + weight + '<br><span style="font-size:0.8rem;color:var(--muted)">' + (it.difficulty || '') + questions + '</span></div><div class="mastery-dots">' + dots + '</div></div>';
+  });
+}
+
+// --- Errors Tab ---
+function renderErrors(p) {
+  const weakPoints = p.weak_points || [];
+  const points = p.exam_points || [];
+  const weakPointDetails = points.filter(pt => weakPoints.includes(pt.id) || (pt.mastery || 0) < 3);
+
+  if (weakPointDetails.length === 0 && weakPoints.length === 0) {
+    document.getElementById('errors-empty').style.display = 'block';
+    document.getElementById('errors-content').style.display = 'none';
+    return;
+  }
+  document.getElementById('errors-empty').style.display = 'none';
+  document.getElementById('errors-content').style.display = 'block';
+
+  let html = '<h3>⚠️ 薄弱考点 / 错题</h3>';
+  weakPointDetails.forEach(pt => {
+    const correctPct = pt.total_questions > 0 ? Math.round((pt.correct / pt.total_questions) * 100) : 0;
+    html += '<details class="error-card"><summary><strong>' + pt.topic + '</strong> — 掌握度 ' + pt.mastery + '/5 · 正确率 ' + correctPct + '%</summary>';
+    html += '<p style="margin-top:8px;color:var(--muted)">权重: ' + (pt.weight || '未知') + ' | 难度: ' + (pt.difficulty || '未知') + '</p>';
+    html += '<p style="margin-top:4px;color:var(--muted)">做题 ' + (pt.total_questions || 0) + ' 道，正确 ' + (pt.correct || 0) + ' 道</p>';
+    html += '<p style="margin-top:8px">💡 建议：针对此考点做更多同类题目加强练习</p>';
+    html += '</details>';
+  });
+  document.getElementById('errors-content').innerHTML = html;
+}
+
+// --- Init ---
+loadData();
+</script>
+</body>
+</html>
