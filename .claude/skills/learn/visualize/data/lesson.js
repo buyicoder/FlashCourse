@@ -1,4 +1,4 @@
-{
+var LESSON_DATA = {
   "subject": "线性代数",
   "mode": "deep",
   "step_label": "🧠 第 0 步：摸底测试",
@@ -21,4 +21,4 @@
       "html": "提示：$C_{ij} = A$ 的第 $i$ 行 与 $B$ 的第 $j$ 列逐元素相乘再求和"
     }
   ]
-}
+};

@@ -187,14 +187,22 @@
   FlashCourse · 在终端中回答，在本页中阅读 · <span id="refresh-time"></span>
 </footer>
 
+<script src="./data/lesson.js"></script>
 <script>
 let lastContent = '';
 
 async function loadLesson() {
   try {
-    const resp = await fetch('./data/lesson.json');
-    if (!resp.ok) throw new Error('No lesson data');
-    const lesson = await resp.json();
+    // Primary: use embedded variable from <script> tag (works with file://)
+    let lesson;
+    if (typeof LESSON_DATA !== 'undefined') {
+      lesson = LESSON_DATA;
+    } else {
+      // Fallback: try fetch (works with http://)
+      const resp = await fetch('./data/lesson.json');
+      if (!resp.ok) throw new Error('No lesson data');
+      lesson = await resp.json();
+    }
 
     // Only re-render if content changed
     const contentStr = JSON.stringify(lesson);
@@ -258,9 +266,17 @@ async function loadLesson() {
   }
 }
 
-// Load immediately, then poll every 2 seconds
+// Load immediately, then poll every 2 seconds (reload script first)
 loadLesson();
-setInterval(loadLesson, 2000);
+setInterval(() => {
+  // Reload the data script to get updates
+  const old = document.querySelector('script[src="./data/lesson.js"]');
+  if (old) old.remove();
+  const s = document.createElement('script');
+  s.src = './data/lesson.js?t=' + Date.now();
+  s.onload = loadLesson;
+  document.head.appendChild(s);
+}, 2000);
 </script>
 </body>
 </html>

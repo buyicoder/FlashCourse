@@ -85,28 +85,32 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         pass
 
 if __name__ == "__main__":
+    # Force UTF-8 on Windows
+    if sys.platform == "win32":
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+
     API_KEY = find_api_key()
 
     if API_KEY:
         masked = API_KEY[:7] + "..." + API_KEY[-4:]
-        print(f"✅ API Key found: {masked}")
+        print(f"[OK] API Key found: {masked}")
     else:
-        print("❌ No API key found.")
-        print("   Set ANTHROPIC_API_KEY environment variable, or")
-        print(f"   Create .env file next to proxy.py with: ANTHROPIC_API_KEY=sk-ant-...")
-        key = input("   Or paste your API key now: ").strip()
+        print("[!] No API key found.")
+        print("    Set ANTHROPIC_API_KEY environment variable, or")
+        print("    Create .env file next to proxy.py with: ANTHROPIC_API_KEY=sk-ant-...")
+        key = input("    Or paste your API key now: ").strip()
         if key:
             API_KEY = key
-            # Save to .env for next time
             env_file = Path(__file__).parent / ".env"
             env_file.write_text(f"ANTHROPIC_API_KEY={key}")
-            print(f"   ✅ Saved to .env")
+            print(f"    [OK] Saved to .env")
         else:
-            print("   Exiting.")
+            print("    Exiting.")
             sys.exit(1)
 
-    print(f"\n⚡ FlashCourse proxy starting on http://localhost:{PORT}")
-    print(f"   Open app.html in your browser and start learning!\n")
+    print(f"\n[FlashCourse] Proxy starting on http://localhost:{PORT}")
+    print(f"    Open app.html in your browser and start learning!\n")
 
     server = http.server.HTTPServer(("127.0.0.1", PORT), ProxyHandler)
     try:
