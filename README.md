@@ -1,103 +1,106 @@
 # ⚡ FlashCourse
 
-> The Claude Code skill that helps college students master any STEM subject in days, not weeks.
+> 帮助大学生在几天内（而非几周）掌握任何理工科科目的 Claude Code 技能。
 
-Built for students who need to learn fast and learn well. Dual modes: **Deep Understanding** (first-principles + projects) or **Exam Sprint** (flashcards + drills).
+两种模式自由切换：**深度学习**（第一性原理 + 项目实战）或 **考试冲刺**（闪卡 + 题海战术）。为需要学得快、学得好的大学生打造。
 
 ---
 
-## Quick Start
+## 安装（30 秒搞定）
 
-### Install
+**方法一：一句话安装（推荐）**
 
-Copy the skill into your Claude Code project:
+在 Claude Code 中粘贴这句话：
+
+```
+Install the FlashCourse skill from https://github.com/buyicoder/FlashCourse
+```
+
+Claude Code 会自动克隆仓库并配置好技能。
+
+**方法二：手动安装**
 
 ```bash
-# From your project root
-mkdir -p .claude/skills
 git clone https://github.com/buyicoder/FlashCourse.git
 cp -r FlashCourse/.claude/skills/learn .claude/skills/
 ```
 
-Or add as a submodule:
+---
 
-```bash
-git submodule add https://github.com/buyicoder/FlashCourse.git .claude/skills/learn
-```
-
-### Usage
+## 使用
 
 ```
-/learn 线性代数              Start learning a subject
-/learn --list                View all learning progress
-/learn 信号与系统            Resume a previous session
+/learn 线性代数              开始学习一门课
+/learn --list                查看所有学习进度
+/learn 信号与系统            恢复上次学习
 ```
 
-Open `.claude/skills/learn/visualize/index.html` in your browser to see the study dashboard.
+用浏览器打开 `.claude/skills/learn/visualize/index.html` 查看可视化学习看板。
 
 ---
 
-## Two Modes, One Goal
+## 两种模式
 
-| | 🧠 Deep Learning | 📝 Exam Sprint |
+| | 🧠 深度学习 | 📝 考试冲刺 |
 |---|---|---|
-| **Philosophy** | Understand from first principles | Maximize score in minimum time |
-| **Pace** | Slow, student-driven | Fast, exam-point-driven |
-| **Method** | Socratic questioning + projects | Flashcards + drills + error review |
-| **Output** | Notes + runnable project code | Flashcards + mock exams + error log |
-| **Best for** | Building lasting knowledge | Crushing tomorrow's final |
+| **理念** | 从第一性原理理解本质 | 最短时间拿最高分数 |
+| **节奏** | 慢，学生主导 | 快，考点驱动 |
+| **方法** | 苏格拉底提问 + 项目实战 | 闪卡记忆 + 刷题 + 错题复盘 |
+| **产出** | 笔记 + 可运行的代码项目 | 闪卡 + 模拟卷 + 错题日志 |
+| **适合** | 建立长期知识体系 | 搞定明天的期末考试 |
 
-You can switch modes anytime during a session.
-
----
-
-## Dashboard
-
-The built-in visualization page shows:
-
-- 🗺 **Exam Point Map** — Mermaid mind map colored by mastery
-- 🃏 **Flashcards** — CSS 3D flip cards with KaTeX formulas
-- 📊 **Progress** — Chart.js doughnut + per-topic mastery bars
-- 📋 **Error Review** — Expandable error cards with root cause analysis
+学习过程中随时可以说"切换到冲刺模式"或"切换到深度模式"。
 
 ---
 
-## Supported Materials
+## 可视化看板
 
-FlashCourse can work with:
-- Plain text topic names
-- PDF courseware / textbooks
-- Screenshots of notes
-- Course website URLs (auto-scraped)
-- Exam syllabi and scope descriptions
-
-No materials? No problem — FlashCourse teaches from its own STEM knowledge.
+- 🗺 **考点地图** — Mermaid 思维导图，按掌握度着色
+- 🃏 **闪卡翻页** — CSS 3D 翻转动画，支持 KaTeX 公式
+- 📊 **进度看板** — Chart.js 环形图 + 各考点掌握度
+- 📋 **错题本** — 可展开的错题卡片，包含错因分析
 
 ---
 
-## Project Structure
+## 支持的学习材料
+
+- 纯文本主题名（如"线性代数"）
+- PDF 课件 / 教材
+- 课堂笔记截图
+- 课程网站链接（自动抓取）
+- 考试大纲和范围说明
+
+没有材料也能学——FlashCourse 基于自身理工科知识直接教学。
+
+---
+
+## 项目结构
 
 ```
 .claude/skills/learn/
-├── skill.md          # Entry point: info collection → mode dispatch
-├── shared.md         # Data schemas & cross-module protocols
-├── deep.md           # Deep learning sub-skill (7-step flow)
-├── sprint.md         # Exam sprint sub-skill (5-step drill)
+├── skill.md          # 入口：信息收集 → 模式分发
+├── shared.md         # 数据规范 & 跨模块协议
+├── deep.md           # 深度学习子技能（七步教学）
+├── sprint.md         # 考试冲刺子技能（五步训练）
 └── visualize/
-    ├── index.html    # Study dashboard (open in browser)
-    └── data/         # Mirrored session data for visualization
+    ├── index.html    # 可视化看板（浏览器打开）
+    └── data/         # 可视化数据镜像
 ```
 
 ---
 
-## Requirements
+## 环境要求
 
 - [Claude Code](https://claude.ai/code)
-- A modern browser (Chrome / Firefox / Edge) for the dashboard
-- No server, no install, no API keys beyond Claude Code
+- 现代浏览器（Chrome / Firefox / Edge）
+- 无需服务器、无需安装、无需额外 API Key
 
 ---
 
-## License
+## 许可证
 
 MIT
+
+---
+
+> *The Claude Code skill that helps college students master any STEM subject in days, not weeks. Dual modes: deep understanding (first-principles + projects) or exam sprint (flashcards + drills).*
