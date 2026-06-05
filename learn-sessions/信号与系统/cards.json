@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "subject": "信号与系统",
+  "updated_at": "2026-06-05T14:30:00",
+  "cards": [
+    {
+      "id": "ss-01",
+      "topic": "信号分类",
+      "front": "什么是能量信号？",
+      "back": "能量有限的信号，即 $\\int_{-\\infty}^{\\infty} |x(t)|^2 dt < \\infty$",
+      "difficulty": "简单",
+      "last_reviewed": null,
+      "correct_count": 0,
+      "wrong_count": 0
+    },
+    {
+      "id": "ss-02",
+      "topic": "卷积积分",
+      "front": "卷积的交换律是什么？",
+      "back": "$f(t)*g(t) = g(t)*f(t)$",
+      "difficulty": "中等",
+      "last_reviewed": null,
+      "correct_count": 0,
+      "wrong_count": 0
+    },
+    {
+      "id": "ss-03",
+      "topic": "傅里叶变换的性质",
+      "front": "时域卷积对应频域什么？",
+      "back": "乘积。$f(t)*g(t) \\leftrightarrow F(\\omega)G(\\omega)$",
+      "difficulty": "困难",
+      "last_reviewed": null,
+      "correct_count": 0,
+      "wrong_count": 0
+    }
+  ]
+}
