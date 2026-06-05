@@ -1,0 +1,13 @@
+# Claude Code personal settings
+.claude/settings.json
+.claude/settings.local.json
+
+# OS files
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# User session data (keep sample, ignore personal)
+learn-sessions/*
+!learn-sessions/_index.json
+!learn-sessions/信号与系统/
