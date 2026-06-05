@@ -90,9 +90,12 @@ mkdir -p ".claude/skills/learn/visualize/data"
 
 ## 阶段 3：模式分发
 
-在信息收集完成后，自动打开 Chat 应用：
+在信息收集完成后，启动本地代理和 Chat 应用：
 
 ```bash
+# 1. 先启动代理（后台运行，自动读取 API Key）
+cd .claude/skills/learn && python proxy.py &
+# 2. 打开 Chat 应用
 # Windows
 start .claude/skills/learn/visualize/app.html
 # macOS
@@ -103,9 +106,9 @@ xdg-open .claude/skills/learn/visualize/app.html
 
 然后告诉学生：
 
-"⚡ **Chat 应用已自动打开。** 请切换到浏览器继续学习——公式渲染完美、对话体验更好。
+"⚡ **Chat 应用已自动打开。** 无需输入 API Key——本地代理已处理好一切。
 
-模式：**[深度学习/考试冲刺]** | 你可以随时说'切换模式'。
+模式：**[深度学习/考试冲刺]** | 你随时可以说'切换模式'。
 进度看板：`visualize/index.html`"
 
 然后，启动对应模式：

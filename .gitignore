@@ -1,3 +1,8 @@
+# FlashCourse proxy
+proxy/.env
+.claude/skills/learn/.env
+.env
+
 # Claude Code personal settings
 .claude/settings.json
 .claude/settings.local.json

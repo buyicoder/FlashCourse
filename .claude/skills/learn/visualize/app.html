@@ -125,9 +125,14 @@ body {
   <div class="sidebar-logo">⚡ <span>Flash</span>Course</div>
 
   <div class="sidebar-section">
-    <label>🔑 Anthropic API Key</label>
-    <input type="password" id="api-key" placeholder="sk-ant-api03-..." autocomplete="off">
-    <button class="btn btn-ghost" onclick="clearKey()">清除已保存的 Key</button>
+    <label>🟢 连接状态</label>
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+      <span id="proxy-dot" style="width:10px;height:10px;border-radius:50%;background:var(--muted);display:inline-block"></span>
+      <span id="proxy-status" style="font-size:0.8rem;color:var(--muted)">检测中…</span>
+    </div>
+    <div id="proxy-help" style="display:none;margin-top:4px;font-size:0.72rem;color:var(--yellow)">
+      ⚠️ 请先启动代理：<br><code style="background:var(--border);padding:2px 6px;border-radius:3px">python proxy.py</code>
+    </div>
   </div>
 
   <div class="sidebar-section">
@@ -162,8 +167,8 @@ body {
     <div class="hero">
       <div class="icon">⚡</div>
       <h2>FlashCourse</h2>
-      <p>理工科快速学习助手。输入 API Key、学科、模式，马上开始。</p>
-      <p style="font-size:0.82rem;margin-top:8px">没有 Key？去 <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> 创建一个</p>
+      <p>理工科快速学习助手。先运行 <code>python proxy.py</code>，再输入学科和模式即可开始。</p>
+      <p style="font-size:0.82rem;margin-top:8px">代理会自动读取你的 API Key，无需在页面中输入。</p>
     </div>
   </div>
 
@@ -177,29 +182,52 @@ body {
 
 <script>
 // ── State ──
-const S = { apiKey:'', subject:'', mode:'deep', materials:'', msgs:[], history:[], sid:'', on:false };
+const PROXY = 'http://localhost:18765/v1/messages';
+const S = { proxyOk:false, subject:'', mode:'deep', materials:'', msgs:[], history:[], sid:'', on:false };
 
 // ── Boot ──
-(function init() {
-  const k = localStorage.getItem('fc_key'); if (k) { S.apiKey = k; document.getElementById('api-key').value = k; }
+(async function init() {
   document.getElementById('chat-input').addEventListener('input', autoGrow);
   document.getElementById('chat-input').addEventListener('keydown', e => { if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); send(); } });
-  document.getElementById('api-key').addEventListener('change', function() { S.apiKey = this.value.trim(); if (S.apiKey) localStorage.setItem('fc_key', S.apiKey); else localStorage.removeItem('fc_key'); updateBtn(); });
   document.getElementById('subject-input').addEventListener('input', updateBtn);
+  await checkProxy();
   renderSessions();
 })();
 
+async function checkProxy() {
+  const dot = document.getElementById('proxy-dot');
+  const status = document.getElementById('proxy-status');
+  const help = document.getElementById('proxy-help');
+  try {
+    const r = await fetch(PROXY, { method:'POST', headers:{'Content-Type':'application/json'}, body:'{"test":true}' });
+    // Proxy is up (error response is still a response)
+    S.proxyOk = true;
+    dot.style.background = 'var(--green)';
+    dot.style.boxShadow = '0 0 6px var(--green)';
+    status.textContent = '已连接';
+    status.style.color = 'var(--green)';
+    help.style.display = 'none';
+    updateBtn();
+  } catch(e) {
+    S.proxyOk = false;
+    dot.style.background = 'var(--red)';
+    status.textContent = '未连接';
+    status.style.color = 'var(--red)';
+    help.style.display = 'block';
+    updateBtn();
+  }
+}
+
 function autoGrow() { const e = document.getElementById('chat-input'); e.style.height='auto'; e.style.height=Math.min(e.scrollHeight,140)+'px'; }
-function updateBtn() { document.getElementById('btn-start').disabled = !S.apiKey || !document.getElementById('subject-input').value.trim(); }
-function clearKey() { localStorage.removeItem('fc_key'); document.getElementById('api-key').value=''; S.apiKey=''; updateBtn(); }
+function updateBtn() { document.getElementById('btn-start').disabled = !S.proxyOk || !document.getElementById('subject-input').value.trim(); }
 
 // ── Start ──
 function start() {
-  S.apiKey = document.getElementById('api-key').value.trim();
   S.subject = document.getElementById('subject-input').value.trim();
   S.mode = document.getElementById('mode-select').value;
   S.materials = document.getElementById('materials-input').value.trim();
-  if (!S.apiKey||!S.subject) return;
+  if (!S.proxyOk) { alert('请先启动代理: python proxy.py'); return; }
+  if (!S.subject) return;
   S.msgs = []; S.on = true; S.sid = S.subject + '_' + S.mode;
 
   document.getElementById('chat-title').textContent = '📚 ' + S.subject;
@@ -267,9 +295,9 @@ async function go(userMsg) {
   try {
     const sysContent = S.history[0].content;
     const msgs = S.history.slice(1);
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(PROXY, {
       method:'POST',
-      headers:{ 'Content-Type':'application/json', 'x-api-key':S.apiKey, 'anthropic-version':'2023-06-01' },
+      headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:4096, system: sysContent, messages: msgs })
     });
     if (!resp.ok) { const e = await resp.json().catch(()=>({})); throw new Error(e.error?.message || `HTTP ${resp.status}`); }
@@ -279,7 +307,7 @@ async function go(userMsg) {
     if (userMsg) S.msgs.push({ role:'user', content:userMsg });
     S.msgs.push({ role:'assistant', content:txt });
     save(); removeTyping(typing); addMsg('assistant', txt);
-  } catch(e) { removeTyping(typing); addMsg('assistant','❌ **出错：** '+e.message+'\n\n请检查 API Key 或重试。'); }
+  } catch(e) { removeTyping(typing); addMsg('assistant','❌ **出错：** '+e.message+'\n\n请确认代理已启动（`python proxy.py`），然后刷新页面。'); }
   sendBtn.disabled = false; inp.disabled = false; inp.focus();
 }
 
@@ -323,7 +351,7 @@ function save() {
 function renderSessions() {
   const list = document.getElementById('session-list');
   const sessions = [];
-  for (let i=0;i<localStorage.length;i++) { const k=localStorage.key(i); if (k.startsWith('fc_')&&k!=='fc_key') try { sessions.push(JSON.parse(localStorage.getItem(k))); } catch(e){} }
+  for (let i=0;i<localStorage.length;i++) { const k=localStorage.key(i); if (k.startsWith('fc_')) try { sessions.push(JSON.parse(localStorage.getItem(k))); } catch(e){} }
   if (!sessions.length) { list.innerHTML='<div style="padding:14px;text-align:center;color:var(--muted);font-size:0.78rem">暂无学习记录</div>'; return; }
   list.innerHTML = sessions.map(s => {
     const sub = s.messages ? s.msgs.length+' 条消息' : '';
