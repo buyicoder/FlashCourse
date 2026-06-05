@@ -29,13 +29,19 @@ cp -r FlashCourse/.claude/skills/learn .claude/skills/
 
 ## 使用
 
+### 方式一：Chat 应用（推荐）
+
+用浏览器打开 `visualize/app.html`，填入 [Anthropic API Key](https://console.anthropic.com)，输入学科，选择模式，直接对话学习。无需终端。
+
+### 方式二：Claude Code 命令行
+
 ```
 /learn 线性代数              开始学习一门课
 /learn --list                查看所有学习进度
 /learn 信号与系统            恢复上次学习
 ```
 
-用浏览器打开 `.claude/skills/learn/visualize/index.html` 查看可视化学习看板。
+用浏览器打开 `visualize/index.html` 查看可视化学习看板。
 
 ---
 

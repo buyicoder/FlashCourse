@@ -1,0 +1,19 @@
+{
+  "subject": "线性代数",
+  "step_label": "🧠 第 0 步：摸底测试",
+  "title": "让我们先看看你的起点",
+  "blocks": [
+    {
+      "type": "text",
+      "html": "<p>正式开讲前，先来两个问题快速测一下你的当前水平。我会根据你的回答调整后续讲解的深度和节奏。</p><p>请读完题目后<strong>在终端中作答</strong>，我会在那里等你。</p>"
+    },
+    {
+      "type": "question",
+      "html": "<p><strong>问题 1（概念理解）</strong></p><p>解方程时你肯定写过 $3x + 2y = 5$ 这种式子。那么请问：你理解的 <strong>「矩阵」</strong>和 <strong>「向量」</strong>是什么？它们和普通方程组有什么关系？</p><p style=\"color:var(--muted);font-size:0.9rem;margin-top:8px\">用你的话简单说说就行，不需要严谨定义。</p>"
+    },
+    {
+      "type": "question",
+      "html": "<p><strong>问题 2（简单计算）</strong></p><p>给定两个矩阵：</p><p>$$A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}, \\quad B = \\begin{bmatrix} 0 & 1 \\\\ 1 & 0 \\end{bmatrix}$$</p><p>请计算 $A \\times B$ 等于多少？</p>"
+    }
+  ]
+}

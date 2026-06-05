@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashCourse — 理工科快速学习</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155;
+  --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+  --green: #4ade80; --yellow: #fbbf24; --red: #f87171;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+  background: var(--bg); color: var(--text); height: 100vh; display: flex;
+}
+/* ── Sidebar ── */
+.sidebar {
+  width: 270px; background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto;
+}
+.sidebar-logo { padding: 20px 20px 12px; font-size: 1.2rem; font-weight: 700; }
+.sidebar-logo span { color: var(--accent); }
+.sidebar-section { padding: 0 16px 14px; border-bottom: 1px solid var(--border); }
+.sidebar-section label { font-size: 0.7rem; color: var(--muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.sidebar-section input, .sidebar-section select, .sidebar-section textarea {
+  width: 100%; padding: 8px 10px; border-radius: 7px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); font-size: 0.82rem; font-family: inherit;
+}
+.sidebar-section input:focus, .sidebar-section select:focus, .sidebar-section textarea:focus { outline: none; border-color: var(--accent); }
+.sidebar-section textarea { resize: vertical; min-height: 50px; }
+.btn {
+  width: 100%; padding: 10px; border-radius: 8px; border: none; font-size: 0.85rem;
+  font-weight: 600; cursor: pointer; transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #0f172a; margin-top: 6px; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-ghost { background: transparent; border: 1px solid var(--border) !important; color: var(--muted); margin-top: 4px; font-size: 0.72rem; }
+.btn-ghost:hover { color: var(--red); border-color: var(--red) !important; }
+.session-list { flex: 1; overflow-y: auto; padding: 6px; }
+.session-item {
+  padding: 8px 12px; border-radius: 7px; cursor: pointer; font-size: 0.82rem;
+  margin-bottom: 2px; transition: all 0.1s;
+}
+.session-item:hover { background: var(--border); }
+.session-item.active { background: #1e3a5f; color: var(--accent); }
+.session-meta { font-size: 0.7rem; color: var(--muted); }
+.tag {
+  display: inline-block; padding: 1px 5px; border-radius: 4px; font-size: 0.6rem;
+  font-weight: 600; margin-left: 4px;
+}
+.tag-deep { background: #1e3a5f; color: var(--accent); }
+.tag-sprint { background: #3b1f1f; color: var(--red); }
+/* ── Chat ── */
+.chat-wrap { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.chat-header {
+  padding: 12px 22px; background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+}
+.chat-header h2 { font-size: 0.95rem; }
+.chat-log { flex: 1; overflow-y: auto; padding: 20px 22px; }
+.msg { max-width: 760px; margin-bottom: 22px; animation: fadeUp 0.3s; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } }
+.msg.user { margin-left: auto; }
+.msg.user .bubble { background: #1e3a5f; border-radius: 16px 16px 4px 16px; padding: 12px 16px; }
+.msg.assistant .bubble { background: var(--surface); border: 1px solid var(--border); border-radius: 16px 16px 16px 4px; padding: 16px 18px; }
+.msg-sender { font-size: 0.68rem; color: var(--muted); padding: 0 4px 3px; }
+.msg.assistant .msg-sender i { color: var(--green); font-style: normal; }
+.bubble p { margin-bottom: 9px; }
+.bubble p:last-child { margin-bottom: 0; }
+.bubble h3 { color: var(--accent); margin: 14px 0 6px; font-size: 0.95rem; }
+.bubble h4 { margin: 10px 0 5px; font-size: 0.85rem; color: var(--yellow); }
+.bubble ul, .bubble ol { margin: 6px 0; padding-left: 18px; }
+.bubble li { margin-bottom: 3px; }
+.bubble blockquote { border-left: 3px solid var(--accent); padding: 3px 10px; margin: 8px 0; color: var(--muted); font-style: italic; }
+.bubble table { border-collapse: collapse; margin: 10px 0; width: 100%; }
+.bubble th, .bubble td { border: 1px solid var(--border); padding: 6px 10px; font-size: 0.85rem; }
+.bubble th { background: var(--border); }
+.bubble pre { background: #0f172a; border: 1px solid var(--border); border-radius: 7px; padding: 12px; overflow-x: auto; margin: 10px 0; font-size: 0.82rem; }
+.bubble code { background: #334155; padding: 1px 5px; border-radius: 3px; font-size: 0.88em; }
+.bubble pre code { background: none; padding: 0; }
+.bubble .katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+/* typing dots */
+.typing { display: flex; gap: 5px; padding: 8px 0; }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: dot 1.4s infinite ease-in-out both; display: block; }
+.typing i:nth-child(1) { animation-delay: -0.32s; } .typing i:nth-child(2) { animation-delay: -0.16s; }
+@keyframes dot { 0%,80%,100% { transform: scale(0); } 40% { transform: scale(1); } }
+/* input */
+.chat-foot { padding: 14px 22px; background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; }
+.input-row { display: flex; gap: 8px; align-items: flex-end; }
+.chat-input {
+  flex: 1; padding: 10px 14px; border-radius: 11px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); font-size: 0.88rem; resize: none;
+  font-family: inherit; min-height: 42px; max-height: 140px;
+}
+.chat-input:focus { outline: none; border-color: var(--accent); }
+.chat-input:disabled { opacity: 0.4; }
+.btn-send {
+  padding: 10px 22px; border-radius: 11px; border: none; background: var(--accent);
+  color: #0f172a; font-weight: 600; cursor: pointer; font-size: 0.88rem; white-space: nowrap;
+}
+.btn-send:hover { filter: brightness(1.1); }
+.btn-send:disabled { opacity: 0.35; cursor: not-allowed; }
+/* welcome */
+.hero { text-align: center; padding: 60px 20px; }
+.hero .icon { font-size: 4rem; margin-bottom: 14px; }
+.hero h2 { margin-bottom: 8px; }
+.hero p { color: var(--muted); max-width: 480px; margin: 0 auto; }
+.hero a { color: var(--accent); }
+@media (max-width: 720px) {
+  .sidebar { display: none; }
+  .sidebar.open { display: flex; position: fixed; z-index: 99; height: 100%; }
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">⚡ <span>Flash</span>Course</div>
+
+  <div class="sidebar-section">
+    <label>🔑 Anthropic API Key</label>
+    <input type="password" id="api-key" placeholder="sk-ant-api03-..." autocomplete="off">
+    <button class="btn btn-ghost" onclick="clearKey()">清除已保存的 Key</button>
+  </div>
+
+  <div class="sidebar-section">
+    <label>📚 学科</label>
+    <input type="text" id="subject-input" placeholder="例如：线性代数">
+  </div>
+
+  <div class="sidebar-section">
+    <label>🎯 模式</label>
+    <select id="mode-select">
+      <option value="deep">🧠 深度学习 — 理解本质</option>
+      <option value="sprint">📝 考试冲刺 — 快速提分</option>
+    </select>
+    <button class="btn btn-primary" id="btn-start" onclick="start()" disabled>开始学习</button>
+  </div>
+
+  <div class="sidebar-section">
+    <label>📖 学习材料（可选）</label>
+    <textarea id="materials-input" placeholder="课程链接 / 教材 / 考试范围…"></textarea>
+  </div>
+
+  <div class="session-list" id="session-list"></div>
+</aside>
+
+<div class="chat-wrap">
+  <header class="chat-header">
+    <h2 id="chat-title">📚 FlashCourse</h2>
+    <span style="font-size:0.72rem;color:var(--muted)" id="chat-sub">在左侧设置并开始</span>
+  </header>
+
+  <div class="chat-log" id="chat-log">
+    <div class="hero">
+      <div class="icon">⚡</div>
+      <h2>FlashCourse</h2>
+      <p>理工科快速学习助手。输入 API Key、学科、模式，马上开始。</p>
+      <p style="font-size:0.82rem;margin-top:8px">没有 Key？去 <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> 创建一个</p>
+    </div>
+  </div>
+
+  <div class="chat-foot">
+    <div class="input-row">
+      <textarea class="chat-input" id="chat-input" placeholder="准备好后开始…" rows="1" disabled></textarea>
+      <button class="btn-send" id="btn-send" disabled onclick="send()">发送</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──
+const S = { apiKey:'', subject:'', mode:'deep', materials:'', msgs:[], history:[], sid:'', on:false };
+
+// ── Boot ──
+(function init() {
+  const k = localStorage.getItem('fc_key'); if (k) { S.apiKey = k; document.getElementById('api-key').value = k; }
+  document.getElementById('chat-input').addEventListener('input', autoGrow);
+  document.getElementById('chat-input').addEventListener('keydown', e => { if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); send(); } });
+  document.getElementById('api-key').addEventListener('change', function() { S.apiKey = this.value.trim(); if (S.apiKey) localStorage.setItem('fc_key', S.apiKey); else localStorage.removeItem('fc_key'); updateBtn(); });
+  document.getElementById('subject-input').addEventListener('input', updateBtn);
+  renderSessions();
+})();
+
+function autoGrow() { const e = document.getElementById('chat-input'); e.style.height='auto'; e.style.height=Math.min(e.scrollHeight,140)+'px'; }
+function updateBtn() { document.getElementById('btn-start').disabled = !S.apiKey || !document.getElementById('subject-input').value.trim(); }
+function clearKey() { localStorage.removeItem('fc_key'); document.getElementById('api-key').value=''; S.apiKey=''; updateBtn(); }
+
+// ── Start ──
+function start() {
+  S.apiKey = document.getElementById('api-key').value.trim();
+  S.subject = document.getElementById('subject-input').value.trim();
+  S.mode = document.getElementById('mode-select').value;
+  S.materials = document.getElementById('materials-input').value.trim();
+  if (!S.apiKey||!S.subject) return;
+  S.msgs = []; S.on = true; S.sid = S.subject + '_' + S.mode;
+
+  document.getElementById('chat-title').textContent = '📚 ' + S.subject;
+  document.getElementById('chat-sub').textContent = (S.mode==='deep'?'🧠 深度学习':'📝 考试冲刺')+' · 就绪';
+  document.getElementById('chat-input').disabled = false;
+  document.getElementById('btn-send').disabled = false;
+  document.getElementById('chat-input').placeholder = '输入你的回答…';
+  document.getElementById('chat-input').focus();
+  document.getElementById('chat-log').innerHTML = '';
+
+  const sys = buildSys();
+  S.history = [{ role:'system', content: sys }];
+  const welcome = S.mode==='deep'
+    ? `好的，我们来深度学习《${S.subject}》。\n\n**七步教学**：摸底→动机→推导→反问→检验→实战→关联。\n\n先从 **第 0 步：摸底测试** 开始——2-3 个问题测一下你的当前水平。准备好了吗？`
+    : `好的，开始《${S.subject}》考试冲刺！\n\n**五步训练**：划范围→速通→刷题→复盘→补刀。\n\n📊 **第 1 步：划范围。** 马上给你考点地图……`;
+  addMsg('assistant', welcome);
+  go(welcome);
+}
+
+// ── System prompt ──
+function buildSys() {
+  const mat = S.materials ? `\n学习材料：${S.materials}` : '\n无额外材料，基于你的知识直接教学。';
+  const base = `你是 FlashCourse，理工科 AI 导师。学科：${S.subject}，模式：${S.mode==='deep'?'深度学习':'考试冲刺'}。${mat}\n风格：用"你"不用"您"，公式用 KaTeX（行内 $...$ 块级 $$...$$），适当用 emoji 标记教学阶段。\n`;
+  return base + (S.mode==='deep' ? D : P);
+}
+
+const D = `## 深度学习铁律
+1. 不准直接给答案。先反问学生思路。
+2. 直觉优先。每个公式前用日常语言解释。
+3. 没吃透不进下一步。每节末尾做人概念检验题。
+4. 项目要真跑。代码可执行，不给空话。
+5. 数学缺口主动补。
+
+## 七步教学
+**第 0 步：摸底** — 2-3 个水平测试题。
+**第 1 步：动机** — 这概念解决了什么问题？
+**第 2 步：推导** — 直觉→数学→直觉验证。
+**第 3 步：反问** — "如果去掉条件会怎样？"
+**第 4 步：检验** — 概念理解题，必须答对才推进。
+**第 5 步：实战** — 小项目+骨架代码+测试。
+**第 6 步：关联** — 跨学科/跨章节联系。
+每次只讲一个概念。讲完提问等学生回答。`;
+
+const P = `## 冲刺铁律
+1. 不拓展，考试不考不讲。
+2. 先考点地图，再逐个击破。
+3. 题量堆熟练度，不是难度。
+4. 错题不过夜，当场复盘。
+
+## 五步训练
+**第 1 步：划范围** — 考点清单+权重+难度+题型，按高频→低频排序。
+**第 2 步：速通** — 三句话核心+口诀+闪卡。
+**第 3 步：刷题** — 热身→巩固→挑战。
+**第 4 步：复盘** — 错因分类。
+**第 5 步：补刀** — 薄弱考点同类题围剿。
+简洁有力，有紧迫感。每次只讲一个考点，速通后立即出题。`;
+
+// ── API call ──
+async function go(userMsg) {
+  if (userMsg) { S.history.push({ role:'user', content:userMsg }); }
+  const typing = showTyping();
+  const sendBtn = document.getElementById('btn-send');
+  const inp = document.getElementById('chat-input');
+  sendBtn.disabled = true; inp.disabled = true;
+  try {
+    const sysContent = S.history[0].content;
+    const msgs = S.history.slice(1);
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-api-key':S.apiKey, 'anthropic-version':'2023-06-01' },
+      body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:4096, system: sysContent, messages: msgs })
+    });
+    if (!resp.ok) { const e = await resp.json().catch(()=>({})); throw new Error(e.error?.message || `HTTP ${resp.status}`); }
+    const data = await resp.json();
+    const txt = data.content[0].text;
+    S.history.push({ role:'assistant', content:txt });
+    if (userMsg) S.msgs.push({ role:'user', content:userMsg });
+    S.msgs.push({ role:'assistant', content:txt });
+    save(); removeTyping(typing); addMsg('assistant', txt);
+  } catch(e) { removeTyping(typing); addMsg('assistant','❌ **出错：** '+e.message+'\n\n请检查 API Key 或重试。'); }
+  sendBtn.disabled = false; inp.disabled = false; inp.focus();
+}
+
+// ── Chat UI ──
+function send() {
+  if (!S.on) return;
+  const inp = document.getElementById('chat-input');
+  const txt = inp.value.trim(); if (!txt) return;
+  inp.value = ''; inp.style.height = 'auto';
+  addMsg('user', txt); go(txt);
+}
+
+function addMsg(role, content) {
+  const log = document.getElementById('chat-log');
+  const d = document.createElement('div'); d.className = 'msg ' + role;
+  const sender = role==='user' ? '你' : '<i>✦</i> FlashCourse';
+  d.innerHTML = `<div class="msg-sender">${sender}</div><div class="bubble">${md(content)}</div>`;
+  log.appendChild(d); d.scrollIntoView({ behavior:'smooth' });
+  renderMathInElement(d, { delimiters:[
+    {left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},
+    {left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}
+  ], throwOnError:false });
+}
+
+function md(c) {
+  if (typeof marked !== 'undefined') { marked.setOptions({ breaks:true, gfm:true }); return marked.parse(c); }
+  return '<p>'+c.replace(/\n/g,'<br>')+'</p>';
+}
+
+function showTyping() {
+  const el = document.createElement('div'); el.className='msg assistant'; el.id='typing-msg';
+  el.innerHTML = '<div class="msg-sender"><i>✦</i> FlashCourse</div><div class="bubble"><div class="typing"><i></i><i></i><i></i></div></div>';
+  document.getElementById('chat-log').appendChild(el); el.scrollIntoView({behavior:'smooth'}); return el;
+}
+function removeTyping(el) { if (el?.parentNode) el.parentNode.removeChild(el); }
+
+// ── Persistence ──
+function save() {
+  try { localStorage.setItem('fc_'+S.sid, JSON.stringify({subject:S.subject,mode:S.mode,materials:S.materials,msgs:S.msgs})); renderSessions(); } catch(e){}
+}
+function renderSessions() {
+  const list = document.getElementById('session-list');
+  const sessions = [];
+  for (let i=0;i<localStorage.length;i++) { const k=localStorage.key(i); if (k.startsWith('fc_')&&k!=='fc_key') try { sessions.push(JSON.parse(localStorage.getItem(k))); } catch(e){} }
+  if (!sessions.length) { list.innerHTML='<div style="padding:14px;text-align:center;color:var(--muted);font-size:0.78rem">暂无学习记录</div>'; return; }
+  list.innerHTML = sessions.map(s => {
+    const sub = s.messages ? s.msgs.length+' 条消息' : '';
+    const tag = s.mode==='deep' ? '<span class="tag tag-deep">深度</span>' : '<span class="tag tag-sprint">冲刺</span>';
+    return `<div class="session-item" onclick="resume('${s.subject}_${s.mode}')">📚 ${s.subject} ${tag}<div class="session-meta">${sub}</div></div>`;
+  }).join('');
+}
+function resume(sid) {
+  try {
+    const d = JSON.parse(localStorage.getItem('fc_'+sid)); if (!d) return;
+    S.subject=d.subject; S.mode=d.mode; S.materials=d.materials||''; S.msgs=d.msgs; S.sid=sid; S.on=true;
+    document.getElementById('subject-input').value=S.subject; document.getElementById('mode-select').value=S.mode; document.getElementById('materials-input').value=S.materials;
+    document.getElementById('chat-title').textContent='📚 '+S.subject;
+    document.getElementById('chat-sub').textContent=(S.mode==='deep'?'🧠 深度学习':'📝 考试冲刺')+' · 已恢复';
+    document.getElementById('chat-input').disabled=false; document.getElementById('btn-send').disabled=false;
+    const sys = buildSys(); S.history = [{role:'system',content:sys}];
+    S.msgs.forEach(m => { S.history.push({role:m.role, content:m.content}); });
+    document.getElementById('chat-log').innerHTML=''; S.msgs.forEach(m => addMsg(m.role, m.content));
+    updateBtn();
+  } catch(e) { alert('加载失败'); }
+}
+</script>
+</body>
+</html>

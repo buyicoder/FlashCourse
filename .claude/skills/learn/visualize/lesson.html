@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashCourse — 学习内容</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --purple: #c084fc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.8;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 { font-size: 1.3rem; }
+  .badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #1e3a5f;
+    color: var(--accent);
+  }
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+  .step-label {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    background: #1e3a5f;
+    color: var(--accent);
+  }
+  .step-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .content-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .content-block h3 {
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+  }
+  .content-block p { margin-bottom: 12px; }
+  .content-block p:last-child { margin-bottom: 0; }
+  .question-box {
+    background: linear-gradient(135deg, #1e293b, #1a2332);
+    border: 2px solid var(--purple);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .question-box .q-label {
+    color: var(--purple);
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .hint {
+    background: #1e2d1e;
+    border-left: 3px solid var(--green);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 8px 16px;
+    margin: 16px 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+  code {
+    background: #334155;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  pre {
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 100px 20px;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 5rem; margin-bottom: 20px; }
+  .progress-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .progress-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .progress-dot.done { background: var(--green); }
+  .progress-dot.current { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .progress-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+  /* KaTeX overrides for dark theme */
+  .katex { font-size: 1.1em; }
+  .katex-display { overflow-x: auto; overflow-y: hidden; padding: 8px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="page-title">📚 FlashCourse 学习</h1>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="step-badge" class="badge">等待数据…</span>
+  </div>
+</header>
+
+<main id="content-area">
+  <div class="empty-state" id="empty-state">
+    <div class="icon">📖</div>
+    <p>学习内容将在这里展示</p>
+    <p style="font-size:0.85rem;color:var(--muted);margin-top:8px">
+      请在 Claude Code 中继续 /learn 对话，<br>
+      教学内容会自动更新到本页面。
+    </p>
+  </div>
+</main>
+
+<footer>
+  FlashCourse · 在终端中回答，在本页中阅读 · <span id="refresh-time"></span>
+</footer>
+
+<script>
+let lastContent = '';
+
+async function loadLesson() {
+  try {
+    const resp = await fetch('./data/lesson.json');
+    if (!resp.ok) throw new Error('No lesson data');
+    const lesson = await resp.json();
+
+    // Only re-render if content changed
+    const contentStr = JSON.stringify(lesson);
+    if (contentStr === lastContent) return;
+    lastContent = contentStr;
+
+    document.getElementById('empty-state').style.display = 'none';
+
+    // Header
+    document.getElementById('page-title').textContent = '📚 ' + (lesson.subject || 'FlashCourse 学习');
+    document.getElementById('step-badge').textContent = lesson.step_label || '';
+    document.getElementById('refresh-time').textContent = '更新于 ' + new Date().toLocaleTimeString();
+
+    // Build content
+    let html = '';
+
+    // Step indicator
+    if (lesson.step_label) {
+      html += '<div class="step-label">' + lesson.step_label + '</div>';
+    }
+    if (lesson.title) {
+      html += '<div class="step-title">' + lesson.title + '</div>';
+    }
+
+    // Content blocks
+    if (lesson.blocks && lesson.blocks.length > 0) {
+      lesson.blocks.forEach(block => {
+        if (block.type === 'text') {
+          html += '<div class="content-block">' + block.html + '</div>';
+        } else if (block.type === 'question') {
+          html += '<div class="question-box">';
+          html += '<div class="q-label">✏️ 请思考并回答（在终端中作答）</div>';
+          html += block.html;
+          html += '</div>';
+        } else if (block.type === 'hint') {
+          html += '<div class="hint">💡 ' + block.html + '</div>';
+        } else if (block.type === 'quote') {
+          html += '<blockquote>' + block.html + '</blockquote>';
+        } else if (block.type === 'code') {
+          html += '<pre><code>' + block.html + '</code></pre>';
+        }
+      });
+    }
+
+    document.getElementById('content-area').innerHTML = html;
+
+    // Render KaTeX
+    renderMathInElement(document.getElementById('content-area'), {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\(', right: '\\)', display: false},
+        {left: '\\[', right: '\\]', display: true}
+      ],
+      throwOnError: false
+    });
+
+  } catch(e) {
+    document.getElementById('empty-state').style.display = 'block';
+    document.getElementById('refresh-time').textContent = '等待学习数据…';
+  }
+}
+
+// Load immediately, then poll every 2 seconds
+loadLesson();
+setInterval(loadLesson, 2000);
+</script>
+</body>
+</html>

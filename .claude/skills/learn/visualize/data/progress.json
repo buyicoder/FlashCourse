@@ -1,57 +1,15 @@
 {
   "schema_version": 1,
-  "subject": "信号与系统",
-  "mode": "sprint",
+  "subject": "线性代数",
+  "mode": "deep",
   "created_at": "2026-06-05T00:00:00",
-  "updated_at": "2026-06-05T14:30:00",
-  "status": "in_progress",
-  "current_stage": "刷题_傅里叶变换",
-  "exam_points": [
-    {
-      "id": "ss-01",
-      "topic": "信号分类与基本运算",
-      "weight": "高频",
-      "difficulty": "简单",
-      "question_types": ["选择", "填空"],
-      "flashcard": {
-        "front": "什么是能量信号？",
-        "back": "能量有限的信号，即 $\\int_{-\\infty}^{\\infty} |x(t)|^2 dt < \\infty$"
-      },
-      "mastery": 5,
-      "total_questions": 8,
-      "correct": 8
-    },
-    {
-      "id": "ss-02",
-      "topic": "卷积积分",
-      "weight": "高频",
-      "difficulty": "中等",
-      "question_types": ["计算"],
-      "flashcard": {
-        "front": "卷积的交换律是什么？",
-        "back": "$f(t)*g(t) = g(t)*f(t)$"
-      },
-      "mastery": 3,
-      "total_questions": 12,
-      "correct": 7
-    },
-    {
-      "id": "ss-03",
-      "topic": "傅里叶变换的性质",
-      "weight": "高频",
-      "difficulty": "困难",
-      "question_types": ["计算", "证明"],
-      "flashcard": {
-        "front": "时域卷积对应频域什么？",
-        "back": "乘积。$f(t)*g(t) \\leftrightarrow F(\\omega)G(\\omega)$"
-      },
-      "mastery": 1,
-      "total_questions": 5,
-      "correct": 1
-    }
-  ],
+  "updated_at": "2026-06-05T15:00:00",
+  "status": "not_started",
+  "current_stage": "信息收集完成",
+  "exam_points": [],
   "deep_topics": [],
-  "weak_points": ["ss-03"],
-  "material_summary": "已解析：课件.pdf（第1-6章）",
-  "constraints": null
+  "weak_points": [],
+  "error_log": [],
+  "material_summary": "教材：Steven J. Leon《线性代数》（Linear Algebra with Applications），全7章从头学习",
+  "constraints": "无时间限制，深度学习模式"
 }
