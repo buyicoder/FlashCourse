@@ -90,11 +90,23 @@ mkdir -p ".claude/skills/learn/visualize/data"
 
 ## 阶段 3：模式分发
 
-在信息收集完成后，告诉学生：
+在信息收集完成后，自动打开 Chat 应用：
 
-"好的，学情已记录。现在开始 **[深度学习/考试冲刺]** 模式学习。
-你可以随时说'切换到深度模式'或'切换到冲刺模式'来更换学习方式。
-打开 `visualize/index.html` 可以看到可视化学习看板。"
+```bash
+# Windows
+start .claude/skills/learn/visualize/app.html
+# macOS
+open .claude/skills/learn/visualize/app.html
+# Linux
+xdg-open .claude/skills/learn/visualize/app.html
+```
+
+然后告诉学生：
+
+"⚡ **Chat 应用已自动打开。** 请切换到浏览器继续学习——公式渲染完美、对话体验更好。
+
+模式：**[深度学习/考试冲刺]** | 你可以随时说'切换模式'。
+进度看板：`visualize/index.html`"
 
 然后，启动对应模式：
 
